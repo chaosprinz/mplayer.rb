@@ -18,6 +18,12 @@ class MPlayer
     start_mplayer
   end
 
+  def run(cmd)
+    File.open(@options[:fifo],"w+") do |f|
+      f.puts cmd
+    end
+  end
+
   private
 
   # creates the fifo-file which will be used to controll the mplayer-instance. It used the path which was

@@ -31,4 +31,14 @@ describe MPlayer do
     end
   end
 
+  describe "#run" do
+    it 'sends the given command and options to the fifo' do
+      fifo_file = @mplayer.instance_variable_get(:@options)[:fifo]
+      cmd = "stop"
+      @mplayer.run cmd
+      fifo_stream = File.open(fifo_file)
+      data = fifo_stream.read_nonblock(6)
+      data.should eql cmd+"\n"
+    end
+  end
 end
