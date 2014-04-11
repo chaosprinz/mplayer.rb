@@ -1,4 +1,7 @@
+require_relative "./mplayer_commands"
+
 class MPlayer
+  include MPlayerCommands
   attr_accessor :player_pid,:logfile
 
   # returns an instance of MPlayer. The fifo-file to control the related mplayer-process is created. Also
@@ -28,6 +31,38 @@ class MPlayer
   def run(cmd)
     File.open(@options[:fifo],"w+") do |f|
       f.puts cmd
+    end
+  end
+
+  # override respond_to_missing?, so when a method is called, whichs name is a mplayer-command, 
+  # the object should respond to it.
+  # When not, the standard-behaviour is executed. {Object#respond_to?}
+  def respond_to_missing? method,priv
+    if COMMANDS.include? method
+      return true
+    else
+      super method,priv
+    end
+  end
+
+  # dynamically creates and calls methods when the missing method is a mplayer-command (see COMMANDS)
+  def method_missing name,*args
+    if COMMANDS.include? name
+      with_args = Proc.new do |params|
+        run "#{name.to_s} #{params.join(' ')}"
+      end
+      argless = Proc.new do
+        run "#{name.to_s}"
+      end
+      if args.empty?
+        self.class.send :define_method, name, &argless
+        self.send name
+      else
+        self.class.send :define_method, name, &with_args
+        self.send name, args
+      end
+    else
+      super name,args
     end
   end
 

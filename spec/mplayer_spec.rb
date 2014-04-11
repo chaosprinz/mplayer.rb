@@ -32,13 +32,50 @@ describe MPlayer do
   end
 
   describe "#run" do
-    it 'sends the given command and options to the fifo' do
+    it 'sends the given command to the fifo' do
       fifo_file = @mplayer.instance_variable_get(:@options)[:fifo]
       cmd = "stop"
       @mplayer.run cmd
       fifo_stream = File.open(fifo_file)
       data = fifo_stream.read_nonblock(6)
       data.should eql cmd+"\n"
+    end
+  end
+
+  context "using mplayer-commands as method-calls" do
+    it "responds to method-calls which represent a mplayer method" do
+      [
+        :get_audio_bitrate, 
+        :get_audio_codec, 
+        :pause, 
+        :frame_step, 
+        :radio_set_channel,
+        :seek_chapter,
+        :stop
+      ].each do |command|
+        @mplayer.should respond_to command
+      end
+    end
+
+    it "doesnt respond to method-calls which are nonsene" do
+      [
+        :nonsense,
+        :stupid,
+        :quirks
+      ].each do |nonsense|
+        @mplayer.should_not respond_to nonsense.to_sym
+      end
+    end
+
+    it "sends the command to the related fifo" do
+      fifo_file = @mplayer.instance_variable_get(:@options)[:fifo]
+      @mplayer.pause
+      fifo_stream = File.open(fifo_file)
+      data = fifo_stream.read_nonblock(6)
+      data.should eql "pause\n"
+      @mplayer.stop
+      data = fifo_stream.read_nonblock(5)
+      data.should eql "stop\n"
     end
   end
 end
