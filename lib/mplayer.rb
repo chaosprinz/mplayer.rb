@@ -18,6 +18,13 @@ class MPlayer
     start_mplayer
   end
 
+  # sends a command to the FIFO-file, which controlls the related mplayer-instance.
+  # Example:
+  # mp = MPlayer.new
+  # mp.run("pause)         <--send pause-command to mplayer
+  #
+  # @params cmd [String] The command which should be sent to mplayer
+  # @return nil at the moment @TODO:it should return the output of mplayer for the sent command
   def run(cmd)
     File.open(@options[:fifo],"w+") do |f|
       f.puts cmd
