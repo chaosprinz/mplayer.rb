@@ -77,5 +77,13 @@ describe MPlayer do
       data = fifo_stream.read_nonblock(5)
       data.should eql "stop\n"
     end
+
+    it "encapsulates filepathes with quotes" do
+      fifo_file = @mplayer.instance_variable_get(:@options)[:fifo]
+      @mplayer.loadfile '/path/to/song.mp3'
+      fifo_stream = File.open(fifo_file)
+      data = fifo_stream.read_nonblock(29)
+      data.should eql "loadfile '/path/to/song.mp3'\n"
+    end
   end
 end

@@ -49,7 +49,12 @@ class MPlayer
   def method_missing name,*args
     if COMMANDS.include? name
       with_args = Proc.new do |params|
-        run "#{name.to_s} #{params.join(' ')}"
+        params = params.map do |param|
+          if param.start_with? "/"
+            param = "'" + param + "'"
+          end
+        end
+        run "#{name.to_s} #{params.join(" ")}"
       end
       argless = Proc.new do
         run "#{name.to_s}"
