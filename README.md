@@ -36,7 +36,7 @@ player # MPlayer.new fifo: "/tmp/mysuperfifo",logfile: "/home/me/mysuperlogfile"
 
 ##TODO
 
-* escape filepath-arguments for command-methods
+* command-methods should return the correspondending mplayer-response
 * methods for commands that need args should always take args
 * modulize it
 * create some examples
